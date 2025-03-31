@@ -79,90 +79,68 @@ SpaceEconomyDataManager/
 │   │       ├── model_selection.py          # Model selection and training logic
 │   │       ├── hyperparameter_optimization.py  # Randomized search over hyperparams
 │   │       └── result_visualizer.py        # Visualization of metrics and predictions
+│   ├── gui/
+│   │   ├── common_gui.py                   # Shared GUI elements and widgets
+│   │   └── ml_dashboard.py                 # Dashboard for ML training and evaluation
+│   └── analyses/                           #Location of external analysis modules
 │
-│   ├── analyses/
-│   │   ├── burned_area/
-│   │   │   ├── burned_area_dataset_builder.py   # TFRecord builder for fire segmentation
-│   │   │   └── burned_area_dashboard.py         # GUI for configuring burned area workflows
-│   │   ├── vineyard/
-│   │   │   ├── vineyard_dataset_builder.py      # TFRecord builder for vineyard classification
-│   │   │   └── vineyard_dashboard.py            # GUI for vineyard analysis
-│   │   └── semaforo_irrigation/
-│   │       ├── evapotranspiration_analysis_functions.py  # ET metrics and irrigation logic
-│   │       ├── SensorDataManager.py                     # Sensor integration module
-│   │       └── evapotranspiration_dashboard.py          # GUI for irrigation analysis
-│
-│   └── gui/
-│       ├── common_gui.py                    # Shared GUI elements and widgets
-│       └── ml_dashboard.py                  # Dashboard for ML training and evaluation
-│
-├── config/                                   # JSON files and evalscripts for indices
-├── last_session/                             # Stores session metadata
-├── docs/                                     # Documentation
-├── test_download_code.ipynb                  # Code-driven example
-├── test_download_gui.ipynb                   # GUI-based example
-└── README.md
+├── config/                                  # JSON files and evalscripts for indices
+├── last_session/                            # Stores session metadata
+├── docs/                                    # Documentation and usage guide
+├── test_download_code.ipynb                 # Code-driven usage example
+├── test_download_gui.ipynb                  # GUI-based usage example
+└── README.md   
 ```
 
 ---
 
 ## 🔩 Core Modules
 
-Each core module is reusable across multiple analysis domains:
+Each core module is reusable across multiple analysis domains. The core system is designed to handle end-to-end satellite data workflows — from download, organization, transformation, visualization, to machine learning preparation.
 
-| Module              | Description |
-|---------------------|-------------|
-| `data_download.py`  | Authenticates and downloads imagery from Sentinel Hub using evalscripts |
-| `data_manipulator.py` | Organizes, renames, and prepares files for dataset generation |
-| `dataset_preparation.py` | Handles normalization, masking, cropping, and TFRecord serialization |
-| `data_visualizer.py` | Provides utilities for image and NDVI visualization |
-| `ml/` | Contains model selection, hyperparameter tuning, and results visualization |
-| `sdm.py` | Wrapper class exposing the full core pipeline |
+### 📁 `core/` — General Data Handling
 
----
-
-## 🧪 Analysis Modules
-
-### 🔥 Burned Area Segmentation
-
-Located in `analyses/burned_area/`
-
-This module automates the construction of a TFRecord dataset to train models for fire damage detection.
-
-**Key Features:**
-- Reads CEMS activation files (fire GeoJSONs)
-- Applies satellite-specific temporal sampling
-- Masks fire areas and builds binary labels
-- Allows normalization, cropping, and patch generation
-
-**Input:** Fire activations from [Copernicus EMS](https://emergency.copernicus.eu/)
+| File | Description |
+|------|-------------|
+| `data_download.py` | Handles Sentinel Hub authentication and image download. Includes loading of evalscripts, multi-temporal acquisitions, and data export to GeoTIFF format. |
+| `data_manipulator.py` | Post-download reorganization of TIFFs, renaming files by satellite and date, compressing or formatting them into NumPy arrays or CSV for pipeline integration. |
+| `dataset_preparation.py` | Builds machine learning datasets. Includes normalization (quantile or min-max), masking with vector geometries, image patching, TFRecord generation, and augmentation. |
+| `data_visualizer.py` | Provides utility functions for plotting satellite bands, RGB composites, NDVI, and inspecting the structure of TFRecord datasets. |
+| `sdm.py` | Central manager class that integrates all core components into a single accessible API. Used to orchestrate full workflows via code or GUI. |
 
 ---
 
-### 🍇 Vineyard Classification
+### 📁 `ml/` — Machine Learning Toolkit
 
-Located in `analyses/vineyard/`
-
-Automates the process of generating a labeled dataset from vineyard polygons.
-
-**Key Features:**
-- Loads vineyard GeoJSONs and uses `"Classe"` field for label extraction
-- Supports multi-class or binary labeling
-- Retrieves imagery around fixed reference dates
-- Generates structured TFRecord examples
+| File | Description |
+|------|-------------|
+| `data_split.py` | Provides stratified or random splitting of datasets into train/validation/test subsets. Supports user-defined grouping or time-based partitioning. |
+| `model_selection.py` | Defines various model training routines and evaluation strategies. Supports classifiers, regressors, and segmentation models. |
+| `hyperparameter_optimization.py` | Implements random search and tuning routines for model hyperparameters using cross-validation. |
+| `result_visualizer.py` | Visualizes training curves, confusion matrices, ROC curves, and prediction vs ground truth overlays. Helps evaluate model performance. |
 
 ---
 
-### 💧 Semaforo Irrigation
+### 📁 `gui/` — Interactive Tools
 
-Located in `analyses/semaforo_irrigation/`
+| File | Description |
+|------|-------------|
+| `common_gui.py` | Shared widgets and helper functions used across GUIs, such as authentication forms, dropdowns, loggers, and layout builders. |
+| `ml_dashboard.py` | GUI application for managing model training, hyperparameter tuning, and live visualization of results. Supports easy switching of dataset, model, and parameters. |
 
-Focuses on evapotranspiration analysis for precision agriculture.
+---
 
-**Key Features:**
-- Computes evapotranspiration metrics using Sentinel imagery
-- Includes functions for calculating water stress and irrigation need
-- Enables dashboard-based visualization of ET maps
+---
+
+## 🔗 Linked Analysis Modules (Submodules)
+
+| Module Name | Description | Repository |
+|-------------|-------------|------------|
+| 🔥 `SEDM-Wildfire` | Burned Area Segmentation using Sentinel imagery | [Link to repo](https://github.com/gpiparo2/SEDM-Wildfire) |
+| 🍇 `SEDM-Vineyard` | Vineyard classification based on polygon data | [Link to repo](https://github.com/gpiparo2/SEDM-Vineyard) |
+| 💧 `SEDM-Irrigation` | Evapotranspiration-based irrigation monitoring | [Link to repo](https://github.com/gpiparo2/SEDM-Irrigation) |
+
+> ⚠️ These submodules may be private. Request access from the repository maintainer if needed.
 
 ---
 
