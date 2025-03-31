@@ -4,7 +4,7 @@
 
 - 🔥 **Burned Area Segmentation**
 - 🍇 **Vineyard Classification**
-- 💧 **Irrigation Monitoring (Semaforo Irrigation)**
+- 💧 **Irrigation Monitoring**
 
 It also features interactive GUIs to facilitate dataset configuration and exploration, with a clear separation between core functionalities and domain-specific analyses.
 
