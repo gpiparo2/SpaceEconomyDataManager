@@ -1,0 +1,133 @@
+{
+    "ARI": {
+        "calculate": true,
+        "description": "Anthocyanin Reflectance Index",
+        "formula": "(1/GREEN)-(1/RedEdge1)"
+    },
+    "ATSAVI": {
+        "calculate": false,
+        "description": "Adjusted Transformed Soil-Adjusted Vegetation Index",
+        "formula": "1.22*(NIR1-1.22*RED-0.03)/(1.22*NIR1+RED-1.22*0.03+0.08*(1.0+1.22**2.0))"
+    },
+    "BAI": {
+        "calculate": true,
+        "description": "Burned Area Index",
+        "formula": "1/(((0.1-RED)**2)+((0.06-NIR2)**2))"
+    },
+    "BAIS2": {
+        "calculate": true,
+        "description": "Burned Area Index for Sentinel-2",
+        "formula": "(1-((RedEdge2*RedEdge3*NIR2)/(RED))**0.5)*(((SWIR2-NIR2)/((SWIR2+NIR2)**0.5))+1)"
+    },
+    "BRI": {
+        "calculate": false,
+        "description": "Canopy Chlorophyll Content Index",
+        "formula": "((1/GREEN)-(1/RedEdge1))/NIR1"
+    },
+    "CCCI": {
+        "calculate": false,
+        "description": "Canopy Chlorophyll Content Index",
+        "formula": "((NIR1-RedEdge1)/(NIR1+RedEdge1))/((NIR1-RED)/(NIR1+RED))"
+    },
+    "CIgreen": {
+        "calculate": false,
+        "description": "Chlorophyll Index Green",
+        "formula": "(NIR1/GREEN)-1"
+    },    
+    "CIrededge": {
+        "calculate": false,
+        "description": "Chlorophyll Index RedEdge",
+        "formula": "(NIR1/RedEdge1)-1"
+    },
+    "CVI": {
+        "calculate": false,
+        "description": "Chlorophyll Vegetation Index",
+        "formula": "NIR1*RED/(GREEN**2)"
+    },
+    "GLI": {
+        "calculate": false,
+        "description": "Green Leaf Index",
+        "formula": "(2.0*GREEN-RED-BLUE)/(2.0*GREEN+RED+BLUE)"
+    },
+    "GNDVI": {
+        "calculate": false,
+        "description": "Green Normalized Difference Vegetation Index",
+        "formula": "(NIR1-GREEN)/(NIR1+GREEN)"
+    },
+    "LCI": {
+        "calculate": true,
+        "description": "Leaf Chlorophyll Index",
+        "formula": "(NIR1-RedEdge1)/(NIR1+RED)"
+    },
+    "mARI": {
+        "calculate": false,
+        "description": "Modified Anthocyanin Reflectance Index",
+        "formula": "((1/GREEN)-(1/RedEdge1))*NIR1"
+    },    
+    "MCARI": {
+        "calculate": true,
+        "description": "Modified Chlorophyll Absorption in Reflectance Index",
+        "formula": "((RedEdge1-RED)-0.2*(RedEdge1-GREEN))*(RedEdge1/RED)"
+    },
+    "MCARI1": {
+        "calculate": false,
+        "description": "Modified Chlorophyll Absorption in Reflectance Index 1",
+        "formula": "1.2*(2.5*(NIR1-RED)-1.3*(NIR1-GREEN))"
+    },
+    "MCARI2": {
+        "calculate": false,
+        "description": "Modified Chlorophyll Absorption in Reflectance Index 2",
+        "formula": "1.5*(2.5*(NIR1-RED)-1.3*(NIR1-GREEN))/sqrt(((2.0*NIR1+1)**2)-(6*NIR1-5*sqrt(RED))-0.5)"
+    },
+    "MIRBI": {
+        "calculate": true,
+        "description": "Mid-Infrared Burn Index",
+        "formula": "10*SWIR2-9.8*SWIR1+2"
+    },
+    "NBR": {
+        "calculate": true,
+        "description": "Normalized Burn Ratio",
+        "formula": "(NIR2-SWIR2)/(NIR2+SWIR2)"
+    },
+    "NBR2": {
+        "calculate": true,
+        "description": "Normalized Burn Ratio 2",
+        "formula": "(SWIR1-SWIR2)/(SWIR1+SWIR2)"
+    },
+    "NBRp": {
+        "calculate": true,
+        "description": "Normalized Burn Ratio Plus",
+        "formula": "(SWIR2-NIR2-GREEN-BLUE)/(SWIR2+NIR2+GREEN+BLUE)"
+    },
+    "NDRE": {
+        "calculate": true,
+        "description": "Normalized Difference Red Edge Index",
+        "formula": "(NIR1-RedEdge1)/(NIR1+RedEdge1)"
+    },
+    "NDVI": {
+        "calculate": true,
+        "description": "Normalized Difference Vegetation Index",
+        "formula": "(NIR1-RED)/(NIR1+RED)"
+    },
+    "NDWI": {
+        "calculate": true,
+        "description": "Normalized Difference Water Index",
+        "formula": "(GREEN-NIR1)/(GREEN+NIR1)"
+    },
+    "OSAVI": {
+        "calculate": true,
+        "description": "Optimized Soil Adjusted Vegetation Index",
+        "formula": "(1.0+0.16)*(NIR1-RED)/(NIR1+RED+0.16)"
+    },
+    "SLAVI": {
+        "calculate": false,
+        "description": "Specific Leaf Area Vegetation Index",
+        "formula": "NIR1/(RED+SWIR2)"
+    },
+    "TCARI": {
+        "calculate": true,
+        "description": "Transformed Chlorophyll Absorbtion Ratio",
+        "formula": "3.0*((RedEdge1-RED)-0.2*(RedEdge1-GREEN)*(RedEdge1/RED))"
+    }
+
+}
