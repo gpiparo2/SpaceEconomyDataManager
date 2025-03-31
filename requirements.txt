@@ -1,0 +1,3 @@
+pip install numpy rasterio shapely geopandas tensorflow sentinelhub ipywidgets scikit-learn opencv-python jupyterlab
+
+
