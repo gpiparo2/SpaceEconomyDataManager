@@ -136,9 +136,9 @@ Each core module is reusable across multiple analysis domains. The core system i
 
 | Module Name | Description | Repository |
 |-------------|-------------|------------|
-| 🔥 `SEDM-Wildfire` | Burned Area Segmentation using Sentinel imagery | [Link to repo](https://github.com/gpiparo2/SEDM-Wildfire) |
-| 🍇 `SEDM-Vineyard` | Vineyard classification based on polygon data | [Link to repo](https://github.com/gpiparo2/SEDM-Vineyard) |
-| 💧 `SEDM-Irrigation` | Evapotranspiration-based irrigation monitoring | [Link to repo](https://github.com/gpiparo2/SEDM-Irrigation) |
+| 🔥 `SEDM_Wildfire` | Burned Area Segmentation using Sentinel imagery | [Link to repo](https://github.com/gpiparo2/SEDM_Wildfire) |
+| 🍇 `SEDM_Vineyard` | Vineyard classification based on polygon data | [Link to repo](https://github.com/gpiparo2/SEDM_Vineyard) |
+| 💧 `SEDM_Irrigation` | Evapotranspiration-based irrigation monitoring | [Link to repo](https://github.com/gpiparo2/SEDM_Irrigation) |
 
 > ⚠️ These submodules may be private. Request access from the repository maintainer if needed.
 
