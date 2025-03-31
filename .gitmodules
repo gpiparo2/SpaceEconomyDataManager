@@ -1,9 +1,9 @@
-[submodule "SatelliteDataManager/analyses/SEDM-Wildfire"]
-	path = SatelliteDataManager/analyses/SEDM-Wildfire
-	url = git@github.com:gpiparo2/SEDM-Wildfire.git
-[submodule "SatelliteDataManager/analyses/SEDM-Vineyard"]
-	path = SatelliteDataManager/analyses/SEDM-Vineyard
-	url = git@github.com:gpiparo2/SEDM-Vineyard.git
-[submodule "SatelliteDataManager/analyses/SEDM-Irrigation"]
-	path = SatelliteDataManager/analyses/SEDM-Irrigation
-	url = git@github.com:gpiparo2/SEDM-Irrigation.git
+[submodule "SatelliteDataManager/analyses/SEDM_Wildfire"]
+	path = SatelliteDataManager/analyses/SEDM_Wildfire
+	url = git@github.com:gpiparo2/SEDM_Wildfire.git
+[submodule "SatelliteDataManager/analyses/SEDM_Vineyard"]
+	path = SatelliteDataManager/analyses/SEDM_Vineyard
+	url = git@github.com:gpiparo2/SEDM_Vineyard.git
+[submodule "SatelliteDataManager/analyses/SEDM_Irrigation"]
+	path = SatelliteDataManager/analyses/SEDM_Irrigation
+	url = git@github.com:gpiparo2/SEDM_Irrigation.git
