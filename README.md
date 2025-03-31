@@ -43,13 +43,23 @@ SpaceEconomyDataManager simplifies Earth observation workflows by integrating:
 
 > **Requirements**: Python 3.6+
 
-Install the required packages:
-
+Install all required packages:
 ```bash
-pip install numpy rasterio shapely geopandas tensorflow sentinelhub ipywidgets
+pip install requirements.txt
 ```
 
-> Optional: Install JupyterLab for using the interactive dashboards.
+---
+
+### 🛡️ Sentinel Hub Authentication
+
+To access satellite data, you need valid Sentinel Hub credentials.
+
+1. Register at [Copernicus Sentinel Hub](https://dataspace.copernicus.eu/copernicus-data-space-ecosystem-dashboard)
+2. Create a new OAuth **client** in your account dashboard
+3. Note down your **Client ID** and **Client Secret**
+
+Store these credentials in your environment or provide them when prompted by the application.  
+You can also authenticate in notebooks or GUIs using the provided widgets.
 
 ---
 
@@ -58,14 +68,39 @@ pip install numpy rasterio shapely geopandas tensorflow sentinelhub ipywidgets
 ```
 SpaceEconomyDataManager/
 ├── SatelliteDataManager/
-│   ├── core/                # Core satellite data processing logic
-│   ├── analyses/            # Domain-specific workflows
-│   └── gui/                 # GUI Dashboards
-├── config/                 # Evalscripts and indices config
-├── last_session/           # Saved sessions
-├── docs/                   # Usage guide
-├── test_download_code.ipynb
-├── test_download_gui.ipynb
+│   ├── core/
+│   │   ├── data_download.py                # Download Sentinel data using evalscripts
+│   │   ├── data_manipulator.py             # Organize and standardize downloaded images
+│   │   ├── dataset_preparation.py          # Normalize, mask, and serialize to TFRecords
+│   │   ├── data_visualizer.py              # Visualization utilities (RGB, NDVI, etc.)
+│   │   ├── sdm.py                          # Unified wrapper to manage the full pipeline
+│   │   └── ml/
+│   │       ├── data_split.py               # Train/test splitting and stratified sampling
+│   │       ├── model_selection.py          # Model selection and training logic
+│   │       ├── hyperparameter_optimization.py  # Randomized search over hyperparams
+│   │       └── result_visualizer.py        # Visualization of metrics and predictions
+│
+│   ├── analyses/
+│   │   ├── burned_area/
+│   │   │   ├── burned_area_dataset_builder.py   # TFRecord builder for fire segmentation
+│   │   │   └── burned_area_dashboard.py         # GUI for configuring burned area workflows
+│   │   ├── vineyard/
+│   │   │   ├── vineyard_dataset_builder.py      # TFRecord builder for vineyard classification
+│   │   │   └── vineyard_dashboard.py            # GUI for vineyard analysis
+│   │   └── semaforo_irrigation/
+│   │       ├── evapotranspiration_analysis_functions.py  # ET metrics and irrigation logic
+│   │       ├── SensorDataManager.py                     # Sensor integration module
+│   │       └── evapotranspiration_dashboard.py          # GUI for irrigation analysis
+│
+│   └── gui/
+│       ├── common_gui.py                    # Shared GUI elements and widgets
+│       └── ml_dashboard.py                  # Dashboard for ML training and evaluation
+│
+├── config/                                   # JSON files and evalscripts for indices
+├── last_session/                             # Stores session metadata
+├── docs/                                     # Documentation
+├── test_download_code.ipynb                  # Code-driven example
+├── test_download_gui.ipynb                   # GUI-based example
 └── README.md
 ```
 
@@ -155,6 +190,7 @@ Found in `gui/` and `analyses/**/dashboard.py` files, these ipywidgets-based GUI
 
 Inline docstrings are provided throughout the code.  
 For a full module-by-module guide, see [docs/usage.md](docs/usage.md)
+(NOT READY)
 
 ---
 
@@ -171,5 +207,4 @@ Developed by **Giuseppe Piparo**
 - [Copernicus Open Access Hub](https://scihub.copernicus.eu/dhus/#/home)
 - [Copernicus Emergency Management Service (CEMS)](https://emergency.copernicus.eu/)
 
----
-
+```
