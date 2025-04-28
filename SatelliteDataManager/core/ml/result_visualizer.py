@@ -9,6 +9,12 @@ Functions include plotting training history, ROC curves, and threshold optimizat
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 import numpy as np
+from ..data_visualizer import DataVisualizer             
+import tensorflow as tf
+import json
+import math
+from skimage.measure import find_contours
+
 
 def plot_training_history(history):
     """
@@ -88,4 +94,162 @@ def plot_threshold_optimization(y_true, y_pred, metric_function, thresholds=np.l
     plt.ylabel("Metric Value")
     plt.title("Threshold Optimization")
     plt.legend()
+    plt.show()
+
+def visualize_tfrecord_with_predictions(
+    tfrecord_path: str,
+    prediction_mask: np.ndarray | None = None,
+    crop: bool = False,
+    crop_factor: int = 1,
+    rgb_indices: tuple[int, int, int] = (3, 2, 1),
+    cmap_pred: str = "Reds",
+    save_path: str | None = None,
+    show_input_data: bool = True,
+):
+    """
+    Visualise TFRecord contents plus a full-size Sentinel-2 RGB overlay that shows:
+      • Ground-truth contours (blue)
+      • Model prediction mask (red, semi-transparent)
+
+    Parameters
+    ----------
+    tfrecord_path : str
+        Path to the TFRecord file.
+    prediction_mask : np.ndarray | None
+        Either a full-size 2-D mask (H × W) or a stack of cropped patches
+        shaped (k², H_patch, W_patch) if `crop=True`.
+    crop : bool, default=False
+        Set to True when the TFRecord was created with cropped patches.
+    crop_factor : int, default=1
+        The k value used to split the original image into k×k patches.
+    rgb_indices : tuple[int, int, int], default=(3, 2, 1)
+        Band indices for the Sentinel-2 RGB composite (R, G, B).
+    cmap_pred : str, default="Reds"
+        Matplotlib colormap for the prediction overlay.
+    save_path : str | None, default=None
+        If provided, saves the final figure to this path (PNG).
+    show_diagnostics : bool, default=True
+        If True, runs the built-in diagnostic plots via DataVisualizer
+        before rendering the RGB overlay. Set to False to skip them.
+    """
+    # ------------------------------------------------------------------ #
+    # (0) Optional diagnostic plots
+    # ------------------------------------------------------------------ #
+    if show_input_data:
+        vis = DataVisualizer()
+        vis.inspect_and_visualize_custom_tfrecord(
+            tfrecord_path=tfrecord_path,
+            crop=crop,
+            crop_factor=crop_factor,
+        )
+
+    # ------------------------------------------------------------------ #
+    # (1) Helper to reassemble a k×k grid of patches
+    # ------------------------------------------------------------------ #
+    def _reassemble_patch_grid(
+        patches: np.ndarray,
+        k: int,
+        gap: int = 0
+    ) -> np.ndarray:
+        n, h, w = patches.shape[:3]
+        if n != k * k:
+            raise ValueError(f"Expected {k*k} patches, got {n}.")
+        rows = [np.hstack(patches[r*k:(r+1)*k]) for r in range(k)]
+        return np.vstack(rows)
+
+    # ------------------------------------------------------------------ #
+    # (2) Read all Sentinel-2 and label features from the TFRecord
+    # ------------------------------------------------------------------ #
+    raw_ds = tf.data.TFRecordDataset(tfrecord_path)
+    img_feats, label_feats = [], []
+    for rec in raw_ds:
+        ex = tf.train.Example.FromString(rec.numpy()).features.feature
+        if "Sentinel-2_image" in ex:
+            img_feats.append(ex)
+        if "activation_label" in ex:
+            label_feats.append(ex)
+
+    if not img_feats:
+        print("No Sentinel-2 data found – aborting overlay.")
+        return
+
+    # ------------------------------------------------------------------ #
+    # (3) Build an array (n_patches, H, W, C) → RGB mosaic
+    # ------------------------------------------------------------------ #
+    img_patches = []
+    for ex in img_feats:
+        buf = ex["Sentinel-2_image"].bytes_list.value[0]
+        H = ex["Sentinel-2_height"].int64_list.value[0]
+        W = ex["Sentinel-2_width"].int64_list.value[0]
+        C = ex["Sentinel-2_channels"].int64_list.value[0]
+        n_steps = ex.get(
+            "Sentinel-2_n_steps", tf.train.Int64List(value=[1])
+        ).int64_list.value[0]
+
+        arr = np.frombuffer(buf, dtype=np.float32)
+        arr = arr.reshape((n_steps, H, W, C))[-1] if n_steps > 1 else arr.reshape((H, W, C))
+        img_patches.append(arr)
+    img_patches = np.stack(img_patches, axis=0)                        # (k², Hₚ, Wₚ, C)
+
+    k = crop_factor if crop else 1
+    bands = [
+        _reassemble_patch_grid(img_patches[..., b], k)                # no gap
+        for b in range(img_patches.shape[-1])
+    ]
+    r_idx, g_idx, b_idx = rgb_indices
+    rgb = np.stack([bands[r_idx], bands[g_idx], bands[b_idx]], axis=-1)
+    rgb = (rgb - rgb.min()) / (rgb.ptp() + 1e-8)                      # normalise 0-1
+
+    # ------------------------------------------------------------------ #
+    # (4) Reassemble the ground-truth label (if present)
+    # ------------------------------------------------------------------ #
+    full_label = None
+    if label_feats:
+        lab_patches = []
+        for ex in label_feats:
+            buf = ex["activation_label"].bytes_list.value[0]
+            LH = ex["activation_label_height"].int64_list.value[0]
+            LW = ex["activation_label_width"].int64_list.value[0]
+            lab_patches.append(np.frombuffer(buf, dtype=np.uint8).reshape((LH, LW)))
+        lab_patches = np.stack(lab_patches, axis=0)
+        full_label = _reassemble_patch_grid(lab_patches, k)
+
+    # ------------------------------------------------------------------ #
+    # (5) Reassemble the prediction mask (if passed as patches)
+    # ------------------------------------------------------------------ #
+    if prediction_mask is not None and crop and prediction_mask.ndim == 3:
+        prediction_mask = _reassemble_patch_grid(prediction_mask, k)
+
+    # ------------------------------------------------------------------ #
+    # (6) Extract GT contours
+    # ------------------------------------------------------------------ #
+    contours = []
+    if full_label is not None:
+        try:
+            contours = find_contours(full_label, 0.5)
+        except Exception as e:
+            print(f"Contour extraction failed: {e}")
+
+    # ------------------------------------------------------------------ #
+    # (7) Final plot
+    # ------------------------------------------------------------------ #
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(rgb)
+    ax.axis("off")
+    ax.set_title("Sentinel-2 RGB (last time-step)\nGround truth (blue) • Prediction (red)")
+
+    for c in contours:                                               # c: (rows, cols)
+        ax.plot(c[:, 1], c[:, 0], color="blue", linewidth=1)
+
+    if prediction_mask is not None:
+        if prediction_mask.shape != rgb.shape[:2]:
+            raise ValueError(
+                f"`prediction_mask` shape {prediction_mask.shape} does not match RGB {rgb.shape[:2]}"
+            )
+        alpha = np.clip(prediction_mask.astype(float), 0.0, 1.0) * 0.5
+        ax.imshow(prediction_mask, cmap=cmap_pred, alpha=alpha)
+
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.show()
