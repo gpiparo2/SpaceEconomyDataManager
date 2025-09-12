@@ -1,4 +1,4 @@
-# 🚀 SpaceEconomyDataManager
+# SpaceEconomyDataManager
 
 **SpaceEconomyDataManager** is a modular Python library for acquiring, processing, and analyzing satellite imagery. Built around the Sentinel Hub APIs, it supports automated workflows for various Earth observation use cases, including:
 
