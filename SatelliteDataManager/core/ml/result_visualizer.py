@@ -9,7 +9,7 @@ Functions include plotting training history, ROC curves, and threshold optimizat
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 import numpy as np
-from ..data_visualizer import DataVisualizer
+from ..data_visualizer import DataVisualizer             
 import tensorflow as tf
 import json
 import math
@@ -146,24 +146,17 @@ def visualize_tfrecord_with_predictions(
     # ------------------------------------------------------------------ #
     # (1) Helper to reassemble a k×k grid of patches
     # ------------------------------------------------------------------ #
-    
     def _reassemble_patch_grid(
-            patches: np.ndarray,
-            k: int,
-            gap: int = 5
+        patches: np.ndarray,
+        k: int,
+        gap: int = 0
     ) -> np.ndarray:
-        n_patches, patch_H, patch_W = patches.shape
-        if n_patches != crop_factor * crop_factor:
-            raise ValueError(f"Number of patches ({n_patches}) does not equal crop_factor^2 ({crop_factor**2}).")
-        rows = []
-        for r in range(crop_factor):
-            row_patches = patches[r * crop_factor:(r + 1) * crop_factor]
-            padded = [np.pad(p, ((0, 0), (0, gap)), mode='constant', constant_values=0) for p in row_patches]
-            row = np.hstack(padded)
-            rows.append(row)
-        grid = np.vstack([np.pad(r_img, ((0, gap), (0, 0)), mode='constant', constant_values=0) for r_img in rows])
-        return grid
-    
+        n, h, w = patches.shape[:3]
+        if n != k * k:
+            raise ValueError(f"Expected {k*k} patches, got {n}.")
+        rows = [np.hstack(patches[r*k:(r+1)*k]) for r in range(k)]
+        return np.vstack(rows)
+
     # ------------------------------------------------------------------ #
     # (2) Read all Sentinel-2 and label features from the TFRecord
     # ------------------------------------------------------------------ #
@@ -205,10 +198,8 @@ def visualize_tfrecord_with_predictions(
     ]
     r_idx, g_idx, b_idx = rgb_indices
     rgb = np.stack([bands[r_idx], bands[g_idx], bands[b_idx]], axis=-1)
+    rgb = (rgb - rgb.min()) / (rgb.ptp() + 1e-8)                      # normalise 0-1
 
-    rgb = (rgb - rgb.min()) / (0.5*rgb.ptp())
-    rgb[rgb>1] = 1
-    
     # ------------------------------------------------------------------ #
     # (4) Reassemble the ground-truth label (if present)
     # ------------------------------------------------------------------ #
@@ -242,11 +233,11 @@ def visualize_tfrecord_with_predictions(
     # ------------------------------------------------------------------ #
     # (7) Final plot
     # ------------------------------------------------------------------ #
-    fig, ax = plt.subplots(figsize=(8,8))
+    fig, ax = plt.subplots(figsize=(8, 8))
     ax.imshow(rgb)
     ax.axis("off")
     ax.set_title("Sentinel-2 RGB (last time-step)\nGround truth (blue) • Prediction (red)")
-    
+
     for c in contours:                                               # c: (rows, cols)
         ax.plot(c[:, 1], c[:, 0], color="blue", linewidth=1)
 
