@@ -137,8 +137,8 @@ Each core module is reusable across multiple analysis domains. The core system i
 | Module Name | Description | Repository |
 |-------------|-------------|------------|
 | 🔥 `SEDM_Wildfire` | Burned Area Segmentation using Sentinel imagery | [Link to repo](https://github.com/gpiparo2/SEDM_Wildfire) |
-| 🍇 `SEDM_Vineyard` | Vineyard classification based on polygon data | [Link to repo](https://github.com/gpiparo2/SEDM_Vineyard) |
-| 💧 `SEDM_Irrigation` | Evapotranspiration-based irrigation monitoring | [Link to repo](https://github.com/gpiparo2/SEDM_Irrigation) |
+| 🍇 `SEDM_Vineyard` | Vineyard classification based on polygon data (private) | [Link to repo](https://github.com/gpiparo2/SEDM_Vineyard) |
+| 💧 `SEDM_Irrigation` | Evapotranspiration-based irrigation monitoring (private) | [Link to repo](https://github.com/gpiparo2/SEDM_Irrigation) |
 
 > ⚠️ These submodules may be private. Request access from the repository maintainer if needed.
 
@@ -168,7 +168,6 @@ Found in `gui/` and `analyses/**/dashboard.py` files, these ipywidgets-based GUI
 
 Inline docstrings are provided throughout the code.  
 For a full module-by-module guide, see [docs/usage.md](docs/usage.md)
-(NOT READY)
 
 ---
 
